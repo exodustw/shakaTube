@@ -14,29 +14,18 @@
 		    <?php require_once('template/header.php'); ?>
 	  	</div>
 		<div class="container">
-			<?php
-				$dir = "media/upload";
-				if($list = @scandir($dir)){
-					$folders = array();
-					$files = array();
-					foreach($list as $key => $value){
-						if($value == "."){
-
-						}else if($value == ".."){
-
-						}else if(is_dir($dir."/".$value)){
-							$folders[] = $value;
-						}else{
-							$files[] = $value;
-						}
-					}
-					foreach($folders as $key => $value){
-						echo "<p><a href=\"player.php?video=$value\">$value</a></p>";
-					}
-				}else{
-					echo "<p>No video please upload.</p>";
-				}
-			?>
+			<form action="" method="POST">
+				<div class="mb-3">
+					<label for="email" class="form-label">ID</label>
+					<input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
+					<div id="emailHelp" class="form-text">請輸入註冊時使用的電子郵件信箱</div>
+				</div>
+				<div class="mb-3">
+					<label for="password" class="form-label">Password</label>
+					<input type="password" class="form-control" id="password" name="password">
+				</div>
+				<button type="submit" class="btn btn-primary">登入</button>
+			</form>
 	  	</div>
 
 	</body>

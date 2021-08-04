@@ -6,6 +6,7 @@
 	$fileType = $_FILES["file1"]["type"]; // The type of file it is
 	$fileSize = $_FILES["file1"]["size"]; // File size in bytes
 	$fileErrorMsg = $_FILES["file1"]["error"]; // 0 for false... and 1 for true
+
 	if (!$fileTmpLoc) { // if file not chosen
 	    echo "ERROR: Please browse for a file before clicking the upload button.";
 	    exit();
@@ -13,7 +14,7 @@
 	if(move_uploaded_file($fileTmpLoc, $dir.$fileName)){
 		$cmd = 'mkdir '.
 		'/var/www/video/media/upload/'.
-		str_replace(' ','\\ ',str_replace('.','_',$fileName)).' >/dev/null 2>/dev/null &';
+		str_replace(' ','\\ ',str_replace('.','_',$fileName));
 		shell_exec($cmd);
 		$cmd = 'ffmpeg -re -i /var/www/video/media/upload/'.str_replace(' ','\\ ',$fileName).
 		' -map 0 -map 0 -c:a aac -c:v libx264 '.
@@ -27,7 +28,7 @@
 		'/dash.mpd >/dev/null 2>/dev/null &';
 		shell_exec($cmd);
 	    echo "$fileName upload is complete<br>".$cmd;
-	} else {
+	}else{
 	    echo "move_uploaded_file function failed";
 	}
 ?>
