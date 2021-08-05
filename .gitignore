@@ -1,3 +1,4 @@
 exec/sql.php
+exec/pdo_mysql.php
 test/*.*
 media/upload

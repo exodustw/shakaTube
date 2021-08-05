@@ -1,3 +1,6 @@
+<?php
+	require_once('exec/login_check.php');
+?>
 <!DOCTYPE html>
 <html lang="zh-TW" dir="ltr">
 	<head>
@@ -30,7 +33,7 @@
 				_("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
 				var percent = (event.loaded / event.total) * 100;
 				_("progressBar").value = Math.round(percent);
-				_("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+				_("status").innerHTML = Math.round(percent) + "% uploaded... please don't close this page.";
 			}
 
 			function completeHandler(event) {

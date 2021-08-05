@@ -1,3 +1,6 @@
+<?php
+	require_once('exec/login_check.php');
+?>
 <!DOCTYPE html>
 <html lang="zh-TW" dir="ltr">
 	<head>
@@ -14,18 +17,8 @@
 		    <?php require_once('template/header.php'); ?>
 	  	</div>
 		<div class="container">
-			<form action="exec/login_exec.php" method="POST">
-				<div class="mb-3">
-					<label for="email" class="form-label">ID</label>
-					<input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
-					<div id="emailHelp" class="form-text">Please insert your sign up email address.</div>
-				</div>
-				<div class="mb-3">
-					<label for="password" class="form-label">Password</label>
-					<input type="password" class="form-control" id="password" name="password">
-				</div>
-				<button type="submit" class="btn btn-primary">Sign In</button>
-			</form>
+			<a href="upload.php">Upload</a>
+			<a href="exec/logout_exec.php">Logout</a>
 	  	</div>
 
 	</body>
