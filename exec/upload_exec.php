@@ -92,9 +92,9 @@
 				":v3" => "",
 				":v4" => $fhash,
 				":v5" => 1));
-			$row = $sth->fetchAll();
+			$data = $sth->fetchAll();
 			$nhash = hash('md5', $fhash);
-		}while($row[0][0] <= 0);
+		}while($data[0][0] <= 0);
 
 		//mkdir
 		$cmd1 = 'mkdir /var/www/video/media/upload/'.$fhash;

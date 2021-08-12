@@ -1,3 +1,6 @@
+<?php
+	session_start();
+?>
 <!DOCTYPE html>
 <html lang="zh-TW" dir="ltr">
 	<head>
@@ -15,27 +18,13 @@
 	  	</div>
 		<div class="container">
 			<?php
-				$dir = "media/upload";
-				if($list = @scandir($dir)){
-					$folders = array();
-					$files = array();
-					foreach($list as $key => $value){
-						if($value == "."){
-
-						}else if($value == ".."){
-
-						}else if(is_dir($dir."/".$value)){
-							$folders[] = $value;
-						}else{
-							$files[] = $value;
-						}
-					}
-					foreach($folders as $key => $value){
-						echo "<p><a href=\"player.php?video=$value\">$value</a></p>";
-					}
-				}else{
-					echo "<p>No video please upload.</p>";
-				}
+				require("exec/pdo_mysql.php");
+				$sql = "CALL MEDListInquire(:op);";
+				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+				$sth->execute(array(":op" => @$_SESSION["usercode"] == "" ? 0 : $_SESSION["usercode"]));
+				while ($row = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+					echo "<p><a href=\"player.php?video=".$row["hash"]."\">".$row["標題"]."</a></p>";
+			    }
 			?>
 	  	</div>
 

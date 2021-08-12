@@ -58,7 +58,10 @@
 		<div class="container">
 			<h1>Upload Your Video</h1>
 			<form id="upload_form" enctype="multipart/form-data" method="post">
-				<input type="file" name="file1" id="file1" onchange="uploadFile()"><br>
+				<div class="mb-3">
+				  <label for="file1" class="form-label">Select File</label>
+				  <input class="form-control" type="file" name="file1" id="file1" onchange="uploadFile()">
+				</div>
 				<progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
 				<h3 id="status"></h3>
 				<p id="loaded_n_total"></p>

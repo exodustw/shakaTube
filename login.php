@@ -1,3 +1,6 @@
+<?php
+	session_start();
+?>
 <!DOCTYPE html>
 <html lang="zh-TW" dir="ltr">
 	<head>
@@ -25,6 +28,7 @@
 					<input type="password" class="form-control" id="password" name="password">
 				</div>
 				<button type="submit" class="btn btn-primary">Sign In</button>
+				<a href="register.php" class="btn btn-link">Sign up</a>
 			</form>
 	  	</div>
 

@@ -1,4 +1,6 @@
 exec/sql.php
 exec/pdo_mysql.php
+api/sql.php
+api/pdo_mysql.php
 test/*.*
 media/upload

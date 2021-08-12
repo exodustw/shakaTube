@@ -1,7 +1,10 @@
 <?php
 	session_start();
-    $userid = $_POST["email"];
-    $userpw = hash('sha512', $_POST["password"]);
+	if (!isset($json)) $json = new stdClass();
+	header('Content-Type: application/json');
+
+    $userid = @$_POST["email"];
+    $userpw = hash('sha512', @$_POST["password"]);
 
     if($userid != "" && $userpw != ""){
 		error_reporting (E_ERROR | E_WARNING | E_PARSE);
@@ -38,30 +41,31 @@
           		$_SESSION["usercode"] = $data[0]["會員編號"];
           		$_SESSION["auth"] = $data[0]["等級"];
   				$_SESSION["ip"] = $ip;
-          		echo "<script>location.replace('../index.php');</script>";
+				$json->info = "Success";
 		    }elseif($data[0]["登入狀態"] == -1){
 				http_response_code(401);
-		      	echo "<script>alert('帳號或密碼錯誤');location.replace('../login.php');</script>";
+				$json->info = "帳號或密碼錯誤";
 		    }elseif($data[0]["登入狀態"] == -2){
 				http_response_code(401);
-		      	echo "<script>alert('帳號或密碼錯誤');location.replace('../login.php');</script>";
+				$json->info = "帳號或密碼錯誤";
 		    }elseif($data[0]["登入狀態"] == -3){
 				http_response_code(401);
-		      	echo "<script>alert('帳號重複問題\n請洽管理員處理！');location.replace('../login.php');</script>";
+				$json->info = "帳號重複";
 			}elseif($data[0]["登入狀態"] == -4){
 				http_response_code(401);
-		      	echo "<script>alert('帳號不可為空！');location.replace('../login.php');</script>";
+				$json->info = "帳號為空";
 		    }else{
 				http_response_code(500);
-		      	echo "<script>alert('SQL ERROR (Invalid Result)');location.replace('../ErrorPages/exception.php');</script>";
+				$json->info = "SQL ERROR (Invalid Result)";
 		    }
       	}else{
         	//echo $query;
 			http_response_code(500);
-        	echo "<script>alert('SQL ERROR (No Response)');location.replace('../Errorpages/exception.php');</script>";
+			$json->info = "SQL ERROR (No Response)";
       	}
     }else{
 		http_response_code(401);
-      	echo "<script>alert('帳號密碼不得為空');location.replace('../login.php');</script>";
+		$json->info = "帳號密碼為空";
     }
+	echo json_encode($json);
 ?>
