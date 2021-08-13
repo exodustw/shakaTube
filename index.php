@@ -17,15 +17,28 @@
 		    <?php require_once('template/header.php'); ?>
 	  	</div>
 		<div class="container">
-			<?php
-				require("exec/pdo_mysql.php");
-				$sql = "CALL MEDListInquire(:op);";
-				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-				$sth->execute(array(":op" => @$_SESSION["usercode"] == "" ? 0 : $_SESSION["usercode"]));
-				while ($row = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-					echo "<p><a href=\"player.php?video=".$row["hash"]."\">".$row["標題"]."</a></p>";
-			    }
-			?>
+			<h2>New Videos</h2>
+			<div class="row row-cols-1 row-cols-md-3 g-4">
+				<?php
+					require("exec/pdo_mysql.php");
+					$sql = "CALL MEDListInquire(:op);";
+					$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+					$sth->execute(array(":op" => @$_SESSION["usercode"] == "" ? 0 : $_SESSION["usercode"]));
+					while ($row = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+						echo '<div class="col">
+							    <div class="card h-100">
+							      <img src="media/thumbnail/default_image.png" class="card-img-top" alt="...">
+							      <div class="card-body">
+							        <h5 class="card-title"><a href="player.php?video='.$row["hash"].'">'.$row["標題"].'</a></h5>
+							      </div>
+							      <div class="card-footer">
+							        <small class="text-muted">'.$row["上傳時間"].'</small>
+							      </div>
+							    </div>
+							  </div>';
+				    }
+				?>
+			</div>
 	  	</div>
 
 	</body>

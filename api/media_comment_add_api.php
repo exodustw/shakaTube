@@ -5,16 +5,16 @@
 		header('Content-Type: application/json');
 
 		require("pdo_mysql.php");
-		$sql = "CALL COMAdd(:op,:hash,:content);";
+		$sql = "CALL COMAdd_API(:op,:hash,:content);";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$sth->execute(array(
 			":op" => $_SESSION["usercode"],
 			":hash" => $_REQUEST["hash"],
 			":content" => $_REQUEST["content"]
 		));
-		$row = $sth->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT);
-		$json->status = $row[0];
-		echo json_encode($json);
+		$row = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
+		//$json->status = $row[0];
+		echo json_encode($row);
 	}else{
 		http_response_code(422);
 	}

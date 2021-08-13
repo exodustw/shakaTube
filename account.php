@@ -17,8 +17,16 @@
 		    <?php require_once('template/header.php'); ?>
 	  	</div>
 		<div class="container">
-			<a href="upload.php">Upload</a>
-			<a href="exec/logout_exec.php">Logout</a>
+			<div class="row">
+				<nav class="nav-pills flex-column col-2">
+					<a class="nav-link" href="#">Your videos</a>
+					<a class="nav-link" href="#">History</a>
+					<a class="nav-link active" href="upload.php">Upload video</a>
+				</nav>
+				<div class="col-10">
+					<h2>My Account</h2>
+				</div>
+	  		</div>
 	  	</div>
 
 	</body>

@@ -178,6 +178,7 @@
 			<!-- The data-shaka-player-container tag will make the UI library place the controls in this div.
 			The data-shaka-player-cast-receiver-id tag allows you to provide a Cast Application ID that
 			the cast button will cast to; the value provided here is the sample cast receiver. -->
+			<div id="alert"></div>
 			<div data-shaka-player-container style="max-width: 100%"
 				data-shaka-player-cast-receiver-id="1BA79154">
 				<!-- The data-shaka-player tag will make the UI library use this video element.
@@ -187,34 +188,40 @@
 			<h2><?php echo @$row["標題"]; ?></h2>
 			<p>上傳時間:<?php echo @$row["上傳時間"]; ?></p>
 			<div class="btn-group" role="group">
-				<button type="button" class="btn btn-outline-danger" data-bs-toggle="button" autocomplete="off" aria-pressed="true" id="like" onclick="like_ajax(1);">Like</button>
-				<button type="button" class="btn btn-outline-dark" data-bs-toggle="button" autocomplete="off" aria-pressed="true" id="dislike" onclick="like_ajax(-1);">Dislike</button>
+				<button type="button" class="btn btn-outline-danger" autocomplete="off" id="like" onclick="like_ajax(1);">Like</button>
+				<button type="button" class="btn btn-outline-dark" autocomplete="off" id="dislike" onclick="like_ajax(-1);">Dislike</button>
 			</div>
 
 			<h3>Comments</h3>
-			<div class="container" id="alert"></div>
-			<form id="newcom" action="api/media_comment_add_api.php" method="POST">
+			<div class="container" id="comalert"></div>
+			<form class="mb-3" id="newcom" action="api/media_comment_add_api.php" method="POST">
 				<div class="mb-3">
 					<input type="hidden" name="hash" value="<?php if(isset($_GET["video"])) echo $_GET["video"]; ?>">
 				  	<label for="comment" class="form-label">Your Comment</label>
 				  	<textarea class="form-control" id="comment" name="content" rows="3"></textarea>
 				</div>
-				<input class="btn btn-primary" type="submit" value="Submit">
+				<input class="btn btn-primary mb-3" type="submit" value="Submit">
 			</form>
 
-			<?php
-				$sql = "CALL COMInquire(:op,:hash);";
-				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-				$sth->execute(array(
-					":op" => @$_SESSION["usercode"],
-					":hash" => @$_GET["video"]
-				));
-				while($row2 = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)){
-					echo "<p>".$row2["名稱"]."</p>";
-					echo "<p>".$row2["內容"]."(".$row2["時間"].")</p>";
-				}
+			<div id="com">
+				<?php
+					$sql = "CALL COMInquire(:op,:hash);";
+					$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+					$sth->execute(array(
+						":op" => @$_SESSION["usercode"],
+						":hash" => @$_GET["video"]
+					));
+					while($row2 = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)){
+						echo '<div class="card mb-3 border-light"><div class="card-body">
+						    <h5 class="card-title">'.$row2["名稱"].'</h5>
+						    <h6 class="card-subtitle mb-2 text-muted">'.$row2["時間"].'</h6>
+						    <p class="card-text">'.$row2["內容"].'</p>
+						    <a href="#" class="card-link">回覆</a>
+						  	</div></div>';
+					}
 
-			?>
+				?>
+			</div>
 	  	</div>
 		<script type="text/javascript">
 			var userfav = <?php if(isset($row["userfav"]))echo $row["userfav"]; else echo 0;?>;
@@ -251,6 +258,7 @@
 			}
 
 			function like_ajax(type){
+				$("#alert").html('');
 				$.ajax({
 					url: 'api/media_like_change_api.php?hash=' + '<?php if(isset($_GET["video"])) echo $_GET["video"]; ?>' +
 					'&type=' + type,
@@ -262,8 +270,8 @@
 					error: function(xhr, ajaxOptions, thrownError){
 						//$("body").append(xhr.status);
 						//$("body").append(xhr.responseText);
-
-						alert(thrownError);
+						$("#alert").html('<div class="alert alert-danger" role="alert">Sign in to make your opinion count! Click <a href="login.php" class="alert-link">here</a> to login.</div>');
+						//alert(thrownError);
 					}
 				});
 			}
@@ -283,6 +291,7 @@
 				}
 
 				$("#newcom").submit(function (event) {
+					$("#comalert").html('');
 					var formData = $(this).serialize();
 
 					$.ajax({
@@ -292,16 +301,23 @@
 						dataType: "json",
 						encode: true,
 					}).done(function (data) {
-					  	if(data.status > 0){
-							$("#alert").html('<div class="alert alert-success" role="alert">Submit Success!</div>');
+					  	if(data.vcid > 0){
+							$("#comalert").html('<div class="alert alert-success" role="alert">Submit Success!</div>');
+							$("#com").prepend('<div class="card mb-3 border-light"><div class="card-body">' +
+							    '<h5 class="card-title">' + data.uname + '</h5>' +
+							    '<h6 class="card-subtitle mb-2 text-muted">' + data.time + '</h6>' +
+							    '<p class="card-text">' + data.content + '</p>' +
+							    '<a href="#" class="card-link">回覆</a>' +
+							  	'</div></div>');
 						}else{
-							$("#alert").html('<div class="alert alert-warning" role="alert">Submit Failed!</div>');
+							$("#comalert").html('<div class="alert alert-warning" role="alert">Submit Failed!</div>');
 						}
 					}).fail(function (jqXHR) {
-						$("#alert").html('<div class="alert alert-danger" role="alert">Submit Failed!</div>');
+						$("#comalert").html('<div class="alert alert-danger" role="alert">Submit Failed!</div>');
 					});
 
 					event.preventDefault();
+					$('#newcom').trigger("reset");
 				});
 			});
 		</script>
