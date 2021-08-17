@@ -19,6 +19,7 @@
 	  	</div>
 		<div class="container" id="alert"></div>
 		<div class="container">
+			<h2>Sign Up</h2>
 			<form id="reg" action="api/register_api.php" method="POST">
 				<div class="mb-3 row">
 					<label for="id" class="col-sm-2 col-form-label">Email</label>
