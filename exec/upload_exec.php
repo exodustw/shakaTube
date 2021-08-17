@@ -26,7 +26,7 @@
 
 	function _get_video_attributes($video) {
 
-		$command = 'ffmpeg -i ' . str_replace(' ','\\ ',$video) . ' -vstats 2>&1';
+		$command = 'ffmpeg -i '.str_replace(' ','\\ ',escapeshellcmd($video)).' -vstats 2>&1';
 		$output = shell_exec($command);
 
 		//$regex_sizes = "/Video: ([^,]*), ([^,]*), ([0-9]{1,4})x([0-9]{1,4})/";
@@ -46,12 +46,12 @@
 		}
 
 		return array('codec' => $codec,
-			'width' => $width,
-			'height' => $height,
-			'hours' => $hours,
-			'mins' => $mins,
-			'secs' => $secs,
-			'ms' => $ms
+			'width' => intval($width),
+			'height' => intval($height),
+			'hours' => intval($hours),
+			'mins' => intval($mins),
+			'secs' => intval($secs),
+			'ms' => intval($ms)
 			//,'command' => $command ,'plain' => $output
 		);
 	}
@@ -84,35 +84,52 @@
 		do{
 			$fhash = $nhash;
 			require("pdo_mysql.php");
-			$sql = "CALL MEDAdd(:v1,:v2,:v3,:v4,:v5);";
+			$sql = "CALL MEDAdd(:op,:title,:text,:hash,:time,:type);";
 			$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 			$sth->execute(array(
-				":v1" => $_SESSION["usercode"],
-				":v2" => $fileName,
-				":v3" => "",
-				":v4" => $fhash,
-				":v5" => 1));
+				":op" => $_SESSION["usercode"],
+				":title" => $fileName,
+				":text" => "",
+				":hash" => $fhash,
+				":time" => ($vinfo['hours']*3600 + $vinfo['mins']*60 + $vinfo['secs']),
+				":type" => 1));
 			$data = $sth->fetchAll();
 			$nhash = hash('md5', $fhash);
 		}while($data[0][0] <= 0);
 
 		//mkdir
-		$cmd1 = 'mkdir /var/www/video/media/upload/'.$fhash;
+		mkdir('/var/www/video/media/upload/'.$fhash, 0777);
+
+		//thumbnail
+		$cmd1 = 'ffmpeg -i /var/www/video/media/upload/'.str_replace(' ','\\ ',escapeshellcmd($fileName)).
+		' -ss 00:00:01.000 -vframes 1 -s 640x360 /var/www/video/media/upload/'.$fhash.'/thumbnail.png >/dev/null 2>/dev/null &';
 		shell_exec($cmd1);
 
 		//convert
-		$cmd2 = 'ffmpeg -re -i /var/www/video/media/upload/'.str_replace(' ','\\ ',$fileName).
-		' -map 0 -map 0 -c:a aac -c:v libx264 '.
-		'-b:v:0 2048k -b:v:1 1024k -s:v:0 1280x720 '.
-		'-s:v:1 854x480 -profile:v:1 baseline -profile:v:0 '.
-		'main -bf 1 -keyint_min 120 -g 120 -sc_threshold 0 -b_strategy 0 '.
+		$cmd2 = 'ffmpeg -re -i /var/www/video/media/upload/'.str_replace(' ','\\ ',escapeshellcmd($fileName)).
+		' -c:a aac -c:v libx264 ';
+		switch ($vinfo['height']) {
+			case 1080:
+				$cmd2 .= '-map 0 -b:v:4 6M -s:v:5 1920x1080 -profile:v:5 high ';
+			case 720:
+				$cmd2 .= '-map 0 -b:v:3 2M -s:v:4 1280x720 -profile:v:4 main ';
+			case 480:
+				$cmd2 .= '-map 0 -b:v:2 1024k -s:v:3 854x480 -profile:v:3 main ';
+			case 360:
+				$cmd2 .= '-map 0 -b:v:1 768k -s:v:2 640x360 -profile:v:2 main ';
+			case 240:
+				$cmd2 .= '-map 0 -b:v:0 512k -s:v:1 426x240 -profile:v:1 baseline ';
+			default:
+				$cmd2 .= '-map 0 -b:v:0 144k -s:v:0 256x144 -profile:v:0 baseline ';
+		}
+		$cmd2 .= '-bf 1 -keyint_min 120 -g 120 -sc_threshold 0 -b_strategy 0 '.
 		'-ar:a:1 22050 -use_timeline 1 -use_template 1 '.
 		'-adaptation_sets "id=0,streams=v id=1,streams=a" -f dash '.
 		'/var/www/video/media/upload/'.$fhash.'/dash.mpd >/dev/null 2>/dev/null &';
 		shell_exec($cmd2);
 
-	    echo "$fileName upload is complete<br>".$cmd1;
+	  echo "$fileName upload is complete<br>".json_encode($vinfo);
 	}else{
-	    echo "move_uploaded_file function failed";
+	  echo "move_uploaded_file function failed";
 	}
 ?>
