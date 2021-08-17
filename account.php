@@ -19,15 +19,46 @@
 		<div class="container">
 			<div class="row">
 				<nav class="nav-pills flex-column col-2">
-					<a class="nav-link" href="#">Your videos</a>
-					<a class="nav-link" href="#">History</a>
+					<a class="nav-link" href="account.php?page=myvideos">Your videos</a>
+					<a class="nav-link" href="account.php?page=history">History</a>
 					<a class="nav-link active" href="upload.php">Upload video</a>
 				</nav>
 				<div class="col-10">
-					<h2>My Account</h2>
+					<?php
+						if(@$_GET['page'] == 'myvideos'){
+							echo '<h2>Your Videos</h2>';
+							require("exec/pdo_mysql.php");
+						    $sql = "CALL MEDListInquire(:op);";
+							  $sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+							$sth->execute(array(":op" => @$_SESSION["usercode"] == "" ? 0 : $_SESSION["usercode"]));
+							while ($row = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+								echo '<div class="col">
+												<div class="card mb-3" style="max-width: 75%;">
+													<div class="row g-0">
+														<div class="col-md-4">
+															<a href="player.php?video='.$row["hash"].'">
+																<img src="media/upload/'.$row["hash"].'/thumbnail.png" class="card-img-top"
+																alt="..." onerror="this.onerror=null;this.src=\'media/thumbnail/default_image_2.png\';" >
+															</a>
+														</div>
+														<div class="col-md-8">
+															<div class="card-body">
+																<h5 class="card-title"><a href="player.php?video='.$row["hash"].'">'.$row["標題"].'</a></h5>
+																<small class="text-muted">'.$row["上傳時間"].'</small>
+															</div>
+														</div>
+													</div>
+												</div>
+									  	</div>';
+						  }
+						}else if(@$_GET['page'] == 'history'){
+							echo '<h2>History</h2>';
+						}else{
+							echo '<h2>My Account</h2>';
+						}
+					?>
 				</div>
-	  		</div>
 	  	</div>
-
+	  </div>
 	</body>
 </html>
