@@ -18,7 +18,7 @@
 	  	</div>
 		<div class="container">
 			<h2>New Videos</h2>
-			<div class="row row-cols-1 row-cols-md-3 g-4">
+			<div class="row row-cols-1 row-cols-md-4 g-3">
 				<?php
 					require("exec/pdo_mysql.php");
 					$sql = "CALL MEDListInquire(:op);";
@@ -27,7 +27,10 @@
 					while ($row = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
 						echo '<div class="col">
 							    <div class="card h-100">
-							      <img src="media/thumbnail/default_image.png" class="card-img-top" alt="...">
+										<a href="player.php?video='.$row["hash"].'">
+											<img src="media/upload/'.$row["hash"].'/thumbnail.png" class="card-img-top"
+											alt="..." onerror="this.onerror=null;this.src=\'media/thumbnail/default_image_2.png\';" >
+										</a>
 							      <div class="card-body">
 							        <h5 class="card-title"><a href="player.php?video='.$row["hash"].'">'.$row["標題"].'</a></h5>
 							      </div>
@@ -36,7 +39,7 @@
 							      </div>
 							    </div>
 							  </div>';
-				    }
+				  }
 				?>
 			</div>
 	  	</div>

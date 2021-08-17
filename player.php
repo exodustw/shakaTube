@@ -183,7 +183,7 @@
 				data-shaka-player-cast-receiver-id="1BA79154">
 				<!-- The data-shaka-player tag will make the UI library use this video element.
 				If no video is provided, the UI will automatically make one inside the container div. -->
-				<video data-shaka-player id="video" style="width:100%;height:100%"></video>
+				<video data-shaka-player id="video" style="width:100%;height:100%" autoplay></video>
 			</div>
 			<h2><?php echo @$row["標題"]; ?></h2>
 			<p>上傳時間:<?php echo @$row["上傳時間"]; ?></p>
@@ -208,7 +208,7 @@
 					$sql = "CALL COMInquire(:op,:hash);";
 					$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 					$sth->execute(array(
-						":op" => @$_SESSION["usercode"],
+						":op" => @$_SESSION["usercode"] != "" ? @$_SESSION["usercode"] : 0,
 						":hash" => @$_GET["video"]
 					));
 					while($row2 = $sth->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)){
@@ -277,17 +277,15 @@
 			}
 
 			$(document).ready(function () {
-				window.onload = function(){
-					like_ele.innerHTML = 'Like (' + like + ')';
-					dislike_ele.innerHTML = 'Dislike (' + dislike + ')';
+				like_ele.innerHTML = 'Like (' + like + ')';
+				dislike_ele.innerHTML = 'Dislike (' + dislike + ')';
 
-					if(userfav == 1){
-						like_ele.setAttribute('onclick', 'like_ajax(0);');
-						like_ele.classList.add("active");
-					}else if(userfav == -1){
-						dislike_ele.setAttribute('onclick', 'like_ajax(0);');
-						dislike_ele.classList.add("active");
-					}
+				if(userfav == 1){
+					like_ele.setAttribute('onclick', 'like_ajax(0);');
+					like_ele.classList.add("active");
+				}else if(userfav == -1){
+					dislike_ele.setAttribute('onclick', 'like_ajax(0);');
+					dislike_ele.classList.add("active");
 				}
 
 				$("#newcom").submit(function (event) {
